@@ -5,7 +5,7 @@ play NES rpgs with fceux, lua, and rust
 ## running server
 ```sh
 nix-shell -p lua51Packages.luasocket lua51Packages.rapidjson
-fceux --loadlua final.lua final-fantasy.zip
+fceux --loadlua final-fantasy.lua final-fantasy.zip
 ```
 
 ## connecting client

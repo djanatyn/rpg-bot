@@ -37,6 +37,16 @@ while true do
       -- world map coordinates
       world_x = memory.readbyteunsigned(0x0027),
       world_y = memory.readbyteunsigned(0x0028)
+      -- battle cursor
+      -- x: 0x0200, 0x0204, 0x0208, 0x020C
+      -- y: 0x0203, 0x0207, 0x020B, 0x020F
+      -- { x = 0x9E, y = 0x60 } = FIGHT
+      -- { x = 0xAE, y = 0x60 } = MAGIC
+      -- { x = 0xBE, y = 0x60 } = DRINK
+      -- { x = 0xCE, y = 0x60 } = ITEM
+      -- { x = 0x9E, y = 0x90 } = RUN
+      battle_cursor_x = memory.readbyteunsigned(0x0200),
+      battle_cursor_y = memory.readbyteunsigned(0x0203)
    }
    client:send(rapidjson.encode(msg) .. "\n")
 

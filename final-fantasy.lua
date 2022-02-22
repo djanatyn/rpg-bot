@@ -15,28 +15,25 @@ while true do
    local msg = {
       -- menu selection on new game screen (seems to represent cursor height)
       -- 0x58 = continue, 0x80 = new game
-      menuitem = memory.readbyteunsigned(0x0041),
+      { tags = {"menu selection"}, value = memory.readbyteunsigned(0x0041) },
       -- CHARACTER CREATION
       -- which character are we creating?
       -- 0x00 = 1, 0x10 = 2, 0x20 = 3, 0x30 = 4
-      charselected = memory.readbyteunsigned(0x0067),
+      { tags = {"character selection"}, value = memory.readbyteunsigned(0x0067) },
       -- character classes
-      -- 0x00: fighter
-      -- 0x20: thief
-      -- 0x40: black belt
-      -- 0x60: red mage
-      -- 0x80: white mage
-      -- 0xA0: black mage
-      char1 = memory.readbyteunsigned(0x0201),
-      char2 = memory.readbyteunsigned(0x0219),
-      char3 = memory.readbyteunsigned(0x0231),
-      char4 = memory.readbyteunsigned(0x0249),
+      -- 0x00: fighter        0x20: thief
+      -- 0x40: black belt     0x60: red mage
+      -- 0x80: white mage     0xA0: black mage
+      { tags = {"slot 1 class"}, value = memory.readbyteunsigned(0x0201) },
+      { tags = {"slot 2 class"}, value = memory.readbyteunsigned(0x0219) },
+      { tags = {"slot 3 class"}, value = memory.readbyteunsigned(0x0231) },
+      { tags = {"slot 4 class"}, value = memory.readbyteunsigned(0x0249) },
       -- coordinates for cursor in name selection
-      x = memory.readbyteunsigned(0x0064),
-      y = memory.readbyteunsigned(0x0065),
+      { tags = {"menu cursor x"}, value = memory.readbyteunsigned(0x0064) },
+      { tags = {"menu cursor y"}, value = memory.readbyteunsigned(0x0065) },
       -- world map coordinates
-      world_x = memory.readbyteunsigned(0x0027),
-      world_y = memory.readbyteunsigned(0x0028)
+      { tags = {"world map x"}, value = memory.readbyteunsigned(0x0027) },
+      { tags = {"world map y"}, value = memory.readbyteunsigned(0x0028) },
       -- battle cursor
       -- x: 0x0200, 0x0204, 0x0208, 0x020C
       -- y: 0x0203, 0x0207, 0x020B, 0x020F
@@ -45,8 +42,8 @@ while true do
       -- { x = 0xBE, y = 0x60 } = DRINK
       -- { x = 0xCE, y = 0x60 } = ITEM
       -- { x = 0x9E, y = 0x90 } = RUN
-      battle_cursor_x = memory.readbyteunsigned(0x0200),
-      battle_cursor_y = memory.readbyteunsigned(0x0203)
+      { tags = {"battle cursor x"}, value = memory.readbyteunsigned(0x0200)},
+      { tags = {"battle cursor y"}, value = memory.readbyteunsigned(0x0203)}
    }
    client:send(rapidjson.encode(msg) .. "\n")
 

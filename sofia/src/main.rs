@@ -20,6 +20,9 @@ async fn main() -> io::Result<()> {
     // TODO: poll for socket instead
     sleep(Duration::from_millis(1000)).await;
 
+    // TODO: ctrl-c signal handler
+    // fceux needs SIGKILL to terminate (why?)
+
     let stream = TcpStream::connect(FCEUX_SOCKET).await?;
 
     loop {

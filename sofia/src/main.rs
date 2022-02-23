@@ -1,3 +1,6 @@
+extern crate serde_json;
+
+use serde::Deserialize;
 use std::{io, str};
 use tokio::net::TcpStream;
 use tokio::process::Command;
@@ -6,6 +9,12 @@ use tokio::time::{sleep, Duration};
 const LUA_SCRIPT: &str = "../final-fantasy.lua";
 const ROM: &str = "../final-fantasy.zip";
 const FCEUX_SOCKET: &str = "localhost:8080";
+
+#[derive(Debug, Deserialize)]
+struct MemoryAddress {
+    _value: u64,
+    _tags: Vec<String>,
+}
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
@@ -47,6 +56,10 @@ async fn main() -> io::Result<()> {
                 Err(e) => return Err(e),
             }
         }
+
+        let json = memory.trim().lines().collect::<Vec<_>>();
+        let addresses: Vec<MemoryAddress> = serde_json::from_str(json[0]).expect("failed to parse");
+        println!("{addresses:#?}");
 
         loop {
             stream.writable().await?;

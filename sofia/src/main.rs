@@ -1,9 +1,26 @@
 use std::{io, str};
 use tokio::net::TcpStream;
+use tokio::process::Command;
+use tokio::time::{sleep, Duration};
+
+const LUA_SCRIPT: &str = "../final-fantasy.lua";
+const ROM: &str = "../final-fantasy.zip";
+const FCEUX_SOCKET: &str = "localhost:8080";
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
-    let stream = TcpStream::connect("localhost:8080").await?;
+    let fceux = Command::new("fceux")
+        .arg("--loadlua")
+        .arg(LUA_SCRIPT)
+        .arg(ROM)
+        .spawn()
+        .expect("failed to spawn fceux");
+
+    // wait one second so fceux can launch
+    // TODO: poll for socket instead
+    sleep(Duration::from_millis(1000)).await;
+
+    let stream = TcpStream::connect(FCEUX_SOCKET).await?;
 
     loop {
         let mut buf = [0; 4096];

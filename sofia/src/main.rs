@@ -9,19 +9,22 @@ const FCEUX_SOCKET: &str = "localhost:8080";
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
-    let fceux = Command::new("fceux")
+    let mut fceux = Command::new("fceux")
         .arg("--loadlua")
         .arg(LUA_SCRIPT)
         .arg(ROM)
         .spawn()
         .expect("failed to spawn fceux");
 
+    tokio::spawn(async move {
+        tokio::signal::ctrl_c().await.unwrap();
+        println!("sending kill signal to fceux");
+        fceux.kill().await.expect("kill failed");
+    });
+
     // wait one second so fceux can launch
     // TODO: poll for socket instead
     sleep(Duration::from_millis(1000)).await;
-
-    // TODO: ctrl-c signal handler
-    // fceux needs SIGKILL to terminate (why?)
 
     let stream = TcpStream::connect(FCEUX_SOCKET).await?;
 

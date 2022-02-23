@@ -22,11 +22,14 @@ async fn main() -> io::Result<()> {
         fceux.kill().await.expect("kill failed");
     });
 
-    // wait one second so fceux can launch
-    // TODO: poll for socket instead
-    sleep(Duration::from_millis(1000)).await;
-
-    let stream = TcpStream::connect(FCEUX_SOCKET).await?;
+    let stream: TcpStream = loop {
+        // wait one second so fceux can launch
+        sleep(Duration::from_millis(1000)).await;
+        break match TcpStream::connect(FCEUX_SOCKET).await {
+            Ok(success) => success,
+            Err(_) => continue,
+        };
+    };
 
     loop {
         let mut buf = [0; 4096];

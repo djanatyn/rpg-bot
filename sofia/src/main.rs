@@ -1,6 +1,4 @@
-extern crate serde_json;
-
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::{io, str};
 use tokio::net::TcpStream;
 use tokio::process::Command;
@@ -17,6 +15,33 @@ struct MemoryAddress {
     value: u64,
     tags: Vec<String>,
 }
+
+// https://fceux.com/web/help/LuaFunctionsList.html
+// (joypad library -> joypad.write)
+#[derive(Debug, Serialize, Clone, Copy)]
+struct Input {
+    up: bool,
+    down: bool,
+    left: bool,
+    right: bool,
+    #[serde(rename = "A")]
+    a: bool,
+    #[serde(rename = "B")]
+    b: bool,
+    start: bool,
+    select: bool,
+}
+
+const NEUTRAL: Input = Input {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+    a: false,
+    b: false,
+    start: false,
+    select: false,
+};
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
@@ -68,7 +93,15 @@ async fn main() -> io::Result<()> {
         loop {
             stream.writable().await?;
             let num_addresses = addresses.len();
-            let output = format!("rust: got {num_addresses:?} addresses (frame {frame})\n");
+            // let output = format!("rust: got {num_addresses:?} addresses (frame {frame})\n");
+            let game_input = Input {
+                start: true,
+                ..NEUTRAL
+            };
+            let input_json =
+                serde_json::to_string(&game_input).expect("failed to convert input to JSON");
+            let output = format!("{input_json}\n");
+
             match stream.try_write(&output.into_bytes()) {
                 Ok(_) => break,
                 Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => continue,

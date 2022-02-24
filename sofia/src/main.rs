@@ -9,6 +9,8 @@ use tokio::time::{sleep, Duration};
 const LUA_SCRIPT: &str = "../final-fantasy.lua";
 const ROM: &str = "../final-fantasy.zip";
 const FCEUX_SOCKET: &str = "localhost:8080";
+const FCEUX_START_WAIT: Duration = Duration::from_millis(1000);
+const DELAY_BETWEEN_FRAMES: Duration = Duration::from_millis(16); // TODO: switch to interval?
 
 #[derive(Debug, Deserialize)]
 struct MemoryAddress {
@@ -35,7 +37,7 @@ async fn main() -> io::Result<()> {
 
     let stream: TcpStream = loop {
         // wait one second so fceux can launch
-        sleep(Duration::from_millis(1000)).await;
+        sleep(FCEUX_START_WAIT).await;
         break match TcpStream::connect(FCEUX_SOCKET).await {
             Ok(success) => success,
             Err(_) => continue,
@@ -74,7 +76,7 @@ async fn main() -> io::Result<()> {
             }
         }
 
-        sleep(Duration::from_millis(60)).await;
+        sleep(DELAY_BETWEEN_FRAMES).await;
         frame += 1;
     }
 }

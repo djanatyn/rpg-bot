@@ -42,8 +42,8 @@ while true do
       -- { x = 0xBE, y = 0x60 } = DRINK
       -- { x = 0xCE, y = 0x60 } = ITEM
       -- { x = 0x9E, y = 0x90 } = RUN
-      { tags = {"battle cursor x"}, value = memory.readbyteunsigned(0x0200)},
-      { tags = {"battle cursor y"}, value = memory.readbyteunsigned(0x0203)}
+      { tags = {"battle cursor x"}, value = memory.readbyteunsigned(0x0200) },
+      { tags = {"battle cursor y"}, value = memory.readbyteunsigned(0x0203) }
    }
    client:send(rapidjson.encode(msg) .. "\n")
 
@@ -52,6 +52,9 @@ while true do
 
    -- wait for response from client
    local response = client:receive()
+
+   -- set joypad input
+   joypad.set(1, rapidjson.decode(response))
 
    -- display response from client
    emu.message(response)

@@ -12,8 +12,8 @@ const FCEUX_SOCKET: &str = "localhost:8080";
 
 #[derive(Debug, Deserialize)]
 struct MemoryAddress {
-    _value: u64,
-    _tags: Vec<String>,
+    value: u64,
+    tags: Vec<String>,
 }
 
 #[tokio::main]
@@ -30,6 +30,8 @@ async fn main() -> io::Result<()> {
         println!("sending kill signal to fceux");
         fceux.kill().await.expect("kill failed");
     });
+
+    let mut frame: u64 = 0;
 
     let stream: TcpStream = loop {
         // wait one second so fceux can launch
@@ -63,12 +65,16 @@ async fn main() -> io::Result<()> {
 
         loop {
             stream.writable().await?;
-            let output = format!("{memory}\n");
+            let num_addresses = addresses.len();
+            let output = format!("rust: got {num_addresses:?} addresses (frame {frame})\n");
             match stream.try_write(&output.into_bytes()) {
                 Ok(_) => break,
                 Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => continue,
                 Err(e) => return Err(e),
             }
         }
+
+        sleep(Duration::from_millis(60)).await;
+        frame += 1;
     }
 }
